@@ -1,0 +1,49 @@
+{
+  "name": "muhurat-recover",
+  "description": "Puja Saathi: muhurat window over — voice back on, scale the guide back down.",
+  "definition": {
+    "version": "v1",
+    "timeout": "10m",
+    "inputs": [],
+    "output": {},
+    "tasks": [
+      {
+        "id": "voice_on",
+        "type": "integrations.http",
+        "params": {
+          "method": "PATCH",
+          "url": "https://api.flagsmith.com/api/__future__/environments/Nai8uLW3MdGFp6thQ5hm2s/features/303605/",
+          "headers": {
+            "Content-Type": "application/json",
+            "Authorization": "Api-Key <FLAGSMITH_ADMIN_API_KEY>"
+          },
+          "body": "{\"environment_default\":{\"enabled\":true}}",
+          "timeout": "20s"
+        }
+      },
+      {
+        "id": "scale_down",
+        "type": "k8s.horizontal_rightsize",
+        "params": {
+          "direction": "down",
+          "kind": "Deployment",
+          "namespace": "puja-saathi",
+          "name": "puja-saathi",
+          "scaling_mode": "change_to",
+          "change_to": 2,
+          "min": 2,
+          "max": 10
+        },
+        "depends_on": [
+          "voice_on"
+        ]
+      }
+    ],
+    "triggers": [
+      {
+        "type": "manual",
+        "params": {}
+      }
+    ]
+  }
+}

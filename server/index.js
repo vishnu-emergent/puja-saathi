@@ -117,7 +117,7 @@ app.get('/api/ritual/:id', asyncRoute(async (req, res) => {
   }
 
   let lastError = null;
-  const { texts, failures } = await translateMany(strings, lang, { concurrency: 6, onError: (e) => (lastError = e) });
+  const { texts, failures } = await translateMany(strings, lang, { onError: (e) => (lastError = e) });
   if (failures) emit('sarvam', `Translation partially failed (${failures}/${strings.length})`, lastError?.message ?? '', 'warn');
 
   let i = 0;

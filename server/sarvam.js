@@ -31,7 +31,44 @@ function requireKey() {
   if (!KEY) throw new SarvamError('Sarvam AI is not configured (set SARVAM_API_KEY).', 503);
 }
 
-async function call(pathname, init, { timeoutMs = 30_000 } = {}) {
+// Free-tier friendly: a global limit on concurrent Sarvam calls + backoff on 429.
+const MAX_CONCURRENT = Number(process.env.SARVAM_MAX_CONCURRENCY || 3);
+let active = 0;
+const queue = [];
+async function slot() {
+  if (active < MAX_CONCURRENT) {
+    active++;
+    return;
+  }
+  await new Promise((r) => queue.push(r));
+  active++;
+}
+function release() {
+  active--;
+  queue.shift()?.();
+}
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function call(pathname, init, opts = {}) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      await slot();
+      try {
+        return await callOnce(pathname, init, opts);
+      } finally {
+        release();
+      }
+    } catch (err) {
+      if (err.status === 429 && attempt < 5) {
+        await sleep(800 * 2 ** attempt + Math.random() * 400);
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
+async function callOnce(pathname, init, { timeoutMs = 30_000 } = {}) {
   requireKey();
   const res = await fetch(`${BASE}${pathname}`, {
     ...init,
@@ -115,24 +152,77 @@ export async function translate(text, target) {
   return p;
 }
 
-/** Translate many strings with bounded concurrency; falls back to English per-string on failure. */
-export async function translateMany(texts, target, { concurrency = 4, onError } = {}) {
+/**
+ * Translate many strings in as few calls as possible: strings are packed into
+ * newline-joined batches (each string is one line). If a batch comes back with a
+ * different number of lines, we fall back to translating its strings one by one.
+ * Falls back to English per string on hard failure, and reports how many failed.
+ */
+export async function translateMany(texts, target, { onError } = {}) {
+  if (target === 'en-IN') return { texts: [...texts], failures: 0 };
   const out = new Array(texts.length);
-  let i = 0;
-  let failures = 0;
-  async function worker() {
-    while (i < texts.length) {
-      const idx = i++;
-      try {
-        out[idx] = await translate(texts[idx], target);
-      } catch (err) {
-        failures++;
-        onError?.(err);
-        out[idx] = texts[idx];
-      }
+  const todo = [];
+  texts.forEach((t, i) => {
+    const cached = translations[`${target}:${hash(t)}`];
+    if (cached) out[i] = cached;
+    else todo.push(i);
+  });
+
+  const LIMIT = 1600;
+  const batches = [];
+  let cur = [];
+  let len = 0;
+  for (const i of todo) {
+    const l = texts[i].length + 1;
+    if (cur.length && len + l > LIMIT) {
+      batches.push(cur);
+      cur = [];
+      len = 0;
     }
+    cur.push(i);
+    len += l;
   }
-  await Promise.all(Array.from({ length: Math.min(concurrency, texts.length) }, worker));
+  if (cur.length) batches.push(cur);
+
+  let failures = 0;
+  const one = async (i) => {
+    try {
+      out[i] = await translate(texts[i], target);
+    } catch (err) {
+      failures++;
+      onError?.(err);
+      out[i] = texts[i];
+    }
+  };
+
+  await Promise.all(
+    batches.map(async (batch) => {
+      if (batch.length === 1) return one(batch[0]);
+      try {
+        const body = await call('/translate', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            input: batch.map((i) => texts[i].replace(/\s+/g, ' ').trim()).join('\n'),
+            source_language_code: 'en-IN',
+            target_language_code: target,
+            model: sarvamConfig.translateModel,
+            mode: 'formal',
+          }),
+        });
+        const lines = (body.translated_text || '').split(/\n+/).map((l) => l.trim()).filter(Boolean);
+        if (lines.length !== batch.length) throw new Error('line mismatch');
+        batch.forEach((i, k) => {
+          out[i] = lines[k];
+          translations[`${target}:${hash(texts[i])}`] = lines[k];
+        });
+        scheduleFlush();
+      } catch (err) {
+        if (err.status === 503) throw err;
+        await Promise.all(batch.map(one));
+      }
+    }),
+  );
   return { texts: out, failures };
 }
 

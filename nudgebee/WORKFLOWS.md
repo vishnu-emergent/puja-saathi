@@ -7,7 +7,20 @@ Puja Saathi runs as two Deployments in the `puja-saathi` namespace:
 | `puja-saathi-web` | UI, API, control room, rush probe | — (1 replica) |
 | `puja-saathi` | guide session workers that devotees load at the muhurat | **NudgeBee** |
 
-Three NudgeBee automations do the operations work. Build them in **Workflow Builder** once the NudgeBee agent is installed in the cluster (kind works: install the agent with `nodeAgent.enabled=false`).
+Three NudgeBee automations do the operations work. Their exact definitions are in **[`automations/`](automations/)**. Paste each into NudgeBee → Automations → Create Automation → **Create from Code**, then **Publish** as **Active**.
+
+Agent install notes (kind): install the agent with `--set nodeAgent.enabled=false --set runner.enableWritePermissions=true`. Write permission is required, because without it `k8s.horizontal_rightsize` fails with *"verb patch not in read-only allowlist"*.
+
+Verified end to end on 25 Nov 2026:
+1. The app's probe saw p95 at 2.8 s and fired the webhook.
+2. NudgeBee asked for approval, which was given.
+3. `puja-saathi` scaled from 2 to 8 replicas.
+4. NudgeBee PATCHed Flagsmith `voice_guide` to off.
+5. p95 fell to about 100 ms.
+
+`muhurat-recover` then restored voice and scaled back to 2.
+
+> NudgeBee HTTP tasks run in NudgeBee's cloud, so they can't reach in-cluster Service DNS. The control room doesn't rely on callbacks. It **observes** the effects directly: the number of pods answering the probe, and the `voice_guide` value read back from Flagsmith. The optional `/api/ops/events` callbacks below only work if the app has a public URL.
 
 All callbacks to the app go to `POST http://puja-saathi-web.puja-saathi.svc.cluster.local/api/ops/events` with the header `Authorization: Bearer <OPS_TOKEN>`. The body has the form `{"title": "...", "detail": "...", "level": "info|warn|error|success", "stage": "..."}`. The `stage` field lights up the matching step in the control room's incident tracker.
 
@@ -15,7 +28,7 @@ All callbacks to the app go to `POST http://puja-saathi-web.puja-saathi.svc.clus
 
 ## 1. `muhurat-rush` — webhook trigger (reactive)
 
-**Trigger:** Webhook. Copy the generated URL into `NUDGEBEE_WEBHOOK_URL`.
+**Trigger:** `{"type":"webhook","params":{"integration_name":"puja-saathi-muhurat-rush"}}`. NudgeBee creates a `workflow_webhook` integration with a token, and its URL is `https://app.nudgebee.com/api/webhooks/workflow?token=…`. Put that in `NUDGEBEE_WEBHOOK_URL`.
 The app fires it when the rush probe sees p95 latency above `RUSH_P95_THRESHOLD_MS` for 3 seconds in a row, or when you press **Escalate**. Payload:
 
 ```json

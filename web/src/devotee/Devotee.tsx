@@ -7,6 +7,8 @@ import { Welcome } from './Welcome';
 import { Home } from './Home';
 import { Session } from './Session';
 import { Complete } from './Complete';
+import { Ambient } from '../components/Ambient';
+import { useWide } from '../lib/useWide';
 
 type Place = { city: string; lang: string };
 type Screen = 'welcome' | 'home' | 'session' | 'complete';
@@ -31,6 +33,7 @@ export function Devotee() {
   const [ritualLoading, setRitualLoading] = useState(false);
   const [ritualError, setRitualError] = useState<string | null>(null);
   const skew = useRef(0);
+  const wide = useWide();
   const device = useMemo(() => (EMBED && place ? `embed-${place.city}` : deviceId()), [place]);
 
   useEffect(() => {
@@ -65,9 +68,21 @@ export function Devotee() {
   const inSession = screen === 'session' || screen === 'complete';
 
   // Load (and translate) the ritual pack Flagsmith chose — but never swap it mid-puja.
+  const [retry, setRetry] = useState(0);
+  const retriedAt = useRef(0);
   useEffect(() => {
     if (!pack || !lang || inSession) return;
-    if (ritualRes && ritualRes.ritual.id === pack && (ritualRes.requestedLang ?? ritualRes.lang) === lang) return;
+    const same = ritualRes && ritualRes.ritual.id === pack && (ritualRes.requestedLang ?? ritualRes.lang) === lang;
+    if (same) {
+      const incomplete = !ritualRes.translated && ritualRes.lang !== 'en-IN';
+      if (!incomplete) return;
+      if (retriedAt.current === retry) {
+        // Some lines fell back to English (e.g. a rate limit) — quietly fetch again shortly.
+        const t = setTimeout(() => setRetry((r) => r + 1), 6000);
+        return () => clearTimeout(t);
+      }
+    }
+    retriedAt.current = retry;
     let alive = true;
     setRitualLoading(true);
     setRitualError(null);
@@ -79,7 +94,7 @@ export function Devotee() {
     return () => {
       alive = false;
     };
-  }, [pack, lang, inSession, ritualRes]);
+  }, [pack, lang, inSession, ritualRes, retry]);
 
   const theme = ritualRes?.ritual.theme ?? 'lakshmi';
   useEffect(() => {
@@ -109,7 +124,8 @@ export function Devotee() {
   }
 
   return (
-    <div className="devotee">
+    <div className={wide ? 'devotee devotee--wide' : 'devotee'}>
+      {wide && <Ambient density={screen === 'session' ? 0.6 : 1} />}
       <AnimatePresence mode="wait">
         {screen === 'home' && (
           <motion.div key="home" className="screen" {...fade}>

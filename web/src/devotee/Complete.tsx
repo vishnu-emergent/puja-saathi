@@ -2,12 +2,15 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import type { Config, RitualResponse } from '../lib/api';
 import { speak, stopSpeaking } from '../lib/voice';
+import { useWide } from '../lib/useWide';
 
-const LAMPS = 21;
 
 export function Complete({ config, ritualRes, embed, onHome }: { config: Config; ritualRes: RitualResponse; embed: boolean; onHome: () => void }) {
   const { ritual } = ritualRes;
   const [copied, setCopied] = useState(false);
+  const wide = useWide();
+  const LAMPS = wide ? 84 : 21;
+  const cols = wide ? 21 : 11;
 
   useEffect(() => {
     if (!embed && config.flags.voice_guide.enabled && config.services.sarvam.configured) {
@@ -36,14 +39,18 @@ export function Complete({ config, ritualRes, embed, onHome }: { config: Config;
 
   return (
     <div className="complete">
-      <div className="lamps" aria-hidden>
+      <div className={wide ? 'lamps lamps--field' : 'lamps'} aria-hidden>
         {Array.from({ length: LAMPS }, (_, i) => (
           <motion.span
             key={i}
             className="lamp"
             initial={{ opacity: 0, scale: 0.4 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.25 + Math.abs(i - (LAMPS - 1) / 2) * 0.09, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            transition={{
+              delay: 0.2 + Math.hypot((i % cols) - (cols - 1) / 2, Math.floor(i / cols) * 1.6) * (wide ? 0.07 : 0.09),
+              duration: 0.6,
+              ease: [0.22, 1, 0.36, 1],
+            }}
           >
             <span className="lamp__flame" style={{ animationDelay: `${(i * 137) % 900}ms` }} />
             <span className="lamp__bowl" />

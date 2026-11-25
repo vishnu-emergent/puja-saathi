@@ -1,6 +1,6 @@
 node_modules
 dist
-.cache
 .env
 .git
 *.log
+.nudgebee-agent-install.sh

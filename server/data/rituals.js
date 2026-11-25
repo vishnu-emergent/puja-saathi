@@ -202,8 +202,8 @@ export const RITUALS = {
 
   pongal: {
     id: 'pongal',
-    title: 'Thai Pongal',
-    festival: 'Thai Pongal',
+    title: 'Pongal',
+    festival: 'Pongal',
     theme: 'pongal',
     duration: 45,
     intro:
@@ -279,7 +279,7 @@ export const RITUALS = {
         meaning: 'The Lohri fire marks the end of the coldest nights, and the sun’s return north.',
       },
       {
-        title: 'Prepare the offerings',
+        title: 'Prepare the prasad plate',
         text: 'Fill a plate with til, gur, rewri, gajak, peanuts and popcorn for everyone to share.',
         meaning: 'Sesame and jaggery warm the body in winter — they are the season’s gift.',
       },

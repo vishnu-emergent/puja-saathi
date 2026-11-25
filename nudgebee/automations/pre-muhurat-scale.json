@@ -1,0 +1,62 @@
+{
+  "name": "pre-muhurat-scale",
+  "description": "Puja Saathi: the panchang compiled to cron — pre-scale the guide 20 minutes before every city’s muhurat.",
+  "definition": {
+    "version": "v1",
+    "timeout": "10m",
+    "inputs": [],
+    "output": {},
+    "tasks": [
+      {
+        "id": "prescale",
+        "type": "k8s.horizontal_rightsize",
+        "params": {
+          "direction": "up",
+          "kind": "Deployment",
+          "namespace": "puja-saathi",
+          "name": "puja-saathi",
+          "scaling_mode": "change_to",
+          "change_to": 8,
+          "min": 2,
+          "max": 10
+        }
+      }
+    ],
+    "triggers": [
+      {
+        "type": "schedule",
+        "params": {
+          "cron": "15 13 13 1 *"
+        }
+      },
+      {
+        "type": "schedule",
+        "params": {
+          "cron": "30 13 13 1 *"
+        }
+      },
+      {
+        "type": "schedule",
+        "params": {
+          "cron": "22 1 15 1 *"
+        }
+      },
+      {
+        "type": "schedule",
+        "params": {
+          "cron": "30 1 15 1 *"
+        }
+      },
+      {
+        "type": "webhook",
+        "params": {
+          "integration_name": "puja-saathi-prescale"
+        }
+      },
+      {
+        "type": "manual",
+        "params": {}
+      }
+    ]
+  }
+}

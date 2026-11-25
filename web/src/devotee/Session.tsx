@@ -5,6 +5,7 @@ import { Diya, type DiyaState } from '../components/Diya';
 import { KolamProgress } from '../components/Kolam';
 import { prefetchSpeech, quickIntent, Recorder, speak, stopSpeaking } from '../lib/voice';
 import { cx } from '../lib/util';
+import { useWide } from '../lib/useWide';
 
 type Bubble = { who: 'you' | 'saathi' | 'note'; text: string; lang?: string } | null;
 
@@ -25,6 +26,7 @@ export function Session({ config, ritualRes, embed, onExit }: Props) {
   const [typing, setTyping] = useState(false);
   const [draft, setDraft] = useState('');
   const [quietForced, setQuietForced] = useState(false);
+  const wide = useWide();
   const recorder = useRef<Recorder | null>(null);
   const indexRef = useRef(index);
   indexRef.current = index;
@@ -267,9 +269,11 @@ export function Session({ config, ritualRes, embed, onExit }: Props) {
         <span className="icon-btn icon-btn--ghost" aria-hidden />
       </header>
 
-      <div className="session__progress">
-        <KolamProgress total={total} current={Math.max(0, index)} />
-      </div>
+      {!wide && (
+        <div className="session__progress">
+          <KolamProgress total={total} current={Math.max(0, index)} />
+        </div>
+      )}
 
       <AnimatePresence>
         {quiet && voiceAvailable && (
@@ -282,6 +286,7 @@ export function Session({ config, ritualRes, embed, onExit }: Props) {
         )}
       </AnimatePresence>
 
+      <div className="session__body">
       <main className="session__stage">
         <AnimatePresence mode="wait">
           <motion.article
@@ -324,7 +329,13 @@ export function Session({ config, ritualRes, embed, onExit }: Props) {
         </AnimatePresence>
       </main>
 
-      <footer className="dock">
+      <footer className={cx('dock', wide && 'dock--altar')}>
+        {wide && <div className="altar__glow" aria-hidden />}
+        {wide && (
+          <div className="altar__kolam">
+            <KolamProgress total={total} current={Math.max(0, index)} />
+          </div>
+        )}
         <AnimatePresence mode="wait">
           {bubble && (
             <motion.div
@@ -355,7 +366,7 @@ export function Session({ config, ritualRes, embed, onExit }: Props) {
             disabled={!voiceOn || phase === 'thinking'}
             aria-label={phase === 'listening' ? 'Stop listening' : 'Speak to Puja Saathi'}
           >
-            <Diya size={112} state={voiceOn ? phase : quiet ? 'off' : 'idle'} level={level} />
+            <Diya size={wide ? 220 : 112} state={voiceOn ? phase : quiet ? 'off' : 'idle'} level={level} />
             {phase === 'listening' && <span className="lamp-btn__ring" style={{ transform: `scale(${1 + level * 0.35})` }} />}
           </button>
 
@@ -393,7 +404,13 @@ export function Session({ config, ritualRes, embed, onExit }: Props) {
             </button>
           )
         )}
+        {wide && (
+          <p className="keys" aria-hidden>
+            <kbd>←</kbd> back <span className="dot-sep" /> {voiceOn && (<><kbd>space</kbd> speak <span className="dot-sep" /></>)} <kbd>→</kbd> next <span className="dot-sep" /> <kbd>esc</kbd> leave
+          </p>
+        )}
       </footer>
+      </div>
     </div>
   );
 }

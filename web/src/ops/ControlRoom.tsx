@@ -430,9 +430,12 @@ function useIncident(state: OpsState, traffic: Traffic | null) {
     const done = new Set<string>();
     if (has('detected') || from === startIdx) done.add('detected');
     if (has('triggered')) done.add('triggered');
-    if (has('approval') || has('approved')) done.add('approved');
-    if (has('scaled') || (traffic && podsAtStart > 0 && traffic.pods.length > podsAtStart)) done.add('scaled');
-    if (has('degraded') || state.flags.voice_guide?.enabled === false) done.add('degraded');
+    const scaled = has('scaled') || Boolean(traffic && podsAtStart > 0 && traffic.pods.length > podsAtStart);
+    const degraded = has('degraded') || state.flags.voice_guide?.enabled === false;
+    // NudgeBee only scales / flips the flag after a human approves, so observing either proves approval.
+    if (has('approval') || has('approved') || scaled || degraded) done.add('approved');
+    if (scaled) done.add('scaled');
+    if (degraded) done.add('degraded');
     if (has('resolved') || (done.has('triggered') && traffic && !traffic.rushing && traffic.p95 < traffic.threshold)) done.add('resolved');
     return { done, at: start.at };
   }, [state.events, state.flags, traffic]);

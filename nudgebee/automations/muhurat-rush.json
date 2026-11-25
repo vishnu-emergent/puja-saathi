@@ -1,0 +1,97 @@
+{
+  "name": "muhurat-rush",
+  "description": "Puja Saathi: when devotees flood in at the muhurat, scale the guide and switch Flagsmith voice_guide off (quiet mode).",
+  "definition": {
+    "version": "v1",
+    "timeout": "20m",
+    "inputs": [],
+    "output": {},
+    "tasks": [
+      {
+        "id": "approve",
+        "type": "core.approval",
+        "params": {
+          "approval_type": "in_app",
+          "message": "🪔 Muhurat rush in {{ Inputs.webhook_json.city }} — p95 {{ Inputs.webhook_json.p95_ms }} ms across {{ Inputs.webhook_json.pods_answering }} pod(s). Scale puja-saathi to 8 replicas and switch the guide to quiet mode (Flagsmith voice_guide = off)?",
+          "approval_options": [
+            "approve",
+            "reject"
+          ]
+        }
+      },
+      {
+        "id": "decide",
+        "type": "core.switch",
+        "params": {
+          "expression": "{{ Tasks[approve].output.status }}",
+          "cases": [
+            {
+              "value": "approve",
+              "next": "scale_up"
+            }
+          ],
+          "default_next": "rejected"
+        },
+        "depends_on": [
+          "approve"
+        ]
+      },
+      {
+        "id": "scale_up",
+        "type": "k8s.horizontal_rightsize",
+        "params": {
+          "direction": "up",
+          "kind": "Deployment",
+          "namespace": "puja-saathi",
+          "name": "puja-saathi",
+          "scaling_mode": "change_to",
+          "change_to": 8,
+          "min": 2,
+          "max": 10
+        },
+        "depends_on": [
+          "decide"
+        ]
+      },
+      {
+        "id": "quiet_mode",
+        "type": "integrations.http",
+        "params": {
+          "method": "PATCH",
+          "url": "https://api.flagsmith.com/api/__future__/environments/Nai8uLW3MdGFp6thQ5hm2s/features/303605/",
+          "headers": {
+            "Content-Type": "application/json",
+            "Authorization": "Api-Key <FLAGSMITH_ADMIN_API_KEY>"
+          },
+          "body": "{\"environment_default\":{\"enabled\":false}}",
+          "timeout": "20s"
+        },
+        "depends_on": [
+          "scale_up"
+        ]
+      },
+      {
+        "id": "rejected",
+        "type": "core.print",
+        "params": {
+          "message": "Rush acknowledged — no action taken."
+        },
+        "depends_on": [
+          "decide"
+        ]
+      }
+    ],
+    "triggers": [
+      {
+        "type": "webhook",
+        "params": {
+          "integration_name": "puja-saathi-muhurat-rush"
+        }
+      },
+      {
+        "type": "manual",
+        "params": {}
+      }
+    ]
+  }
+}
