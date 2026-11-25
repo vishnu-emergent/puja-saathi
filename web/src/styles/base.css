@@ -1,0 +1,455 @@
+/* ------------------------------------------------------------------
+   Puja Saathi — design tokens
+   One dark night palette per festival, plus a daylight theme for Pongal.
+   The theme is chosen by the ritual pack, which Flagsmith chooses.
+   ------------------------------------------------------------------ */
+
+:root {
+  --font-display: 'Instrument Serif', 'Noto Serif Devanagari', 'Noto Serif Bengali', 'Noto Serif Tamil', 'Noto Serif Telugu',
+    'Noto Serif Kannada', 'Noto Serif Gujarati', 'Noto Serif Malayalam', 'Noto Serif Gurmukhi', 'Noto Serif Oriya', Georgia, serif;
+  --font-body: 'Geist', 'Noto Sans Devanagari', 'Noto Sans Bengali', 'Noto Sans Tamil', 'Noto Sans Telugu', 'Noto Sans Kannada',
+    'Noto Sans Gujarati', 'Noto Sans Malayalam', 'Noto Sans Gurmukhi', 'Noto Sans Oriya', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --radius: 18px;
+  --radius-sm: 12px;
+
+  /* lakshmi — default */
+  --bg: #120c10;
+  --bg-2: #1c1218;
+  --bg-glow: rgba(243, 166, 50, 0.16);
+  --surface: rgba(255, 236, 214, 0.045);
+  --surface-2: rgba(255, 236, 214, 0.08);
+  --line: rgba(255, 228, 196, 0.11);
+  --line-2: rgba(255, 228, 196, 0.2);
+  --text: #f6ecdd;
+  --text-2: #d9c9b4;
+  --muted: #9b8a79;
+  --accent: #f3a632;
+  --accent-2: #e0592f;
+  --accent-ink: #1a0e06;
+  --flame-core: #ffd66b;
+  --flame-mid: #ff9f2e;
+  --flame-edge: #e2541f;
+  --clay-top: #b5582c;
+  --clay-bottom: #5e2512;
+  --clay-inner: #3a170b;
+  --clay-rim: #f0a35e;
+  color-scheme: dark;
+}
+
+:root[data-theme='kali'] {
+  --bg: #0b0a16;
+  --bg-2: #141228;
+  --bg-glow: rgba(226, 54, 75, 0.16);
+  --surface: rgba(230, 226, 255, 0.045);
+  --surface-2: rgba(230, 226, 255, 0.085);
+  --line: rgba(220, 214, 255, 0.11);
+  --line-2: rgba(220, 214, 255, 0.2);
+  --text: #f1eef9;
+  --text-2: #cdc8e2;
+  --muted: #8e88a8;
+  --accent: #ef4a5f;
+  --accent-2: #8a7cf0;
+  --accent-ink: #1a0509;
+  --flame-core: #ffd9a0;
+  --flame-mid: #ff7a52;
+  --flame-edge: #d72c45;
+  --clay-top: #8b2f3a;
+  --clay-bottom: #3d1219;
+  --clay-inner: #24090e;
+  --clay-rim: #f08a8a;
+}
+
+:root[data-theme='karthigai'] {
+  --bg: #110c07;
+  --bg-2: #1b130b;
+  --bg-glow: rgba(255, 159, 67, 0.17);
+  --surface: rgba(255, 232, 205, 0.045);
+  --surface-2: rgba(255, 232, 205, 0.085);
+  --line: rgba(255, 222, 186, 0.11);
+  --line-2: rgba(255, 222, 186, 0.2);
+  --text: #f8ecdc;
+  --text-2: #dccab3;
+  --muted: #a08b74;
+  --accent: #ff9f43;
+  --accent-2: #c9a27e;
+  --accent-ink: #1d0f02;
+  --flame-core: #ffe08a;
+  --flame-mid: #ffa63d;
+  --flame-edge: #e0661c;
+  --clay-top: #a9592f;
+  --clay-bottom: #552612;
+  --clay-inner: #33160a;
+  --clay-rim: #e9a56b;
+}
+
+:root[data-theme='lohri'] {
+  --bg: #100806;
+  --bg-2: #1b0d08;
+  --bg-glow: rgba(255, 122, 26, 0.2);
+  --surface: rgba(255, 226, 205, 0.045);
+  --surface-2: rgba(255, 226, 205, 0.085);
+  --line: rgba(255, 214, 186, 0.11);
+  --line-2: rgba(255, 214, 186, 0.2);
+  --text: #fbece0;
+  --text-2: #e0c8b4;
+  --muted: #a5887a;
+  --accent: #ff7a1a;
+  --accent-2: #f4c152;
+  --accent-ink: #1e0a00;
+  --flame-core: #ffe27a;
+  --flame-mid: #ff8a1f;
+  --flame-edge: #e0401b;
+  --clay-top: #9a4a26;
+  --clay-bottom: #4a1f0e;
+  --clay-inner: #2e1208;
+  --clay-rim: #f3a66b;
+}
+
+/* Pongal is a sunrise festival — the whole app turns to daylight. */
+:root[data-theme='pongal'] {
+  --bg: #fbf4e6;
+  --bg-2: #f4e9d2;
+  --bg-glow: rgba(240, 170, 40, 0.28);
+  --surface: rgba(90, 60, 20, 0.045);
+  --surface-2: rgba(90, 60, 20, 0.08);
+  --line: rgba(90, 60, 20, 0.12);
+  --line-2: rgba(90, 60, 20, 0.22);
+  --text: #2b2014;
+  --text-2: #5a4631;
+  --muted: #8f7a62;
+  --accent: #d98a06;
+  --accent-2: #4f9a3c;
+  --accent-ink: #fffaf0;
+  --flame-core: #ffd34d;
+  --flame-mid: #ffa21f;
+  --flame-edge: #e2621b;
+  --clay-top: #c76a38;
+  --clay-bottom: #7a3519;
+  --clay-inner: #4a1f0c;
+  --clay-rim: #f6b47a;
+  color-scheme: light;
+}
+
+/* Control room: a neutral, calm palette; colour is reserved for meaning. */
+:root[data-theme='ops'] {
+  --bg: #0d0d0f;
+  --bg-2: #141417;
+  --bg-glow: rgba(243, 166, 50, 0.06);
+  --surface: #16161a;
+  --surface-2: #1d1d22;
+  --line: rgba(255, 255, 255, 0.07);
+  --line-2: rgba(255, 255, 255, 0.13);
+  --text: #ececee;
+  --text-2: #b9b9c0;
+  --muted: #7c7c86;
+  --accent: #f3a632;
+  --accent-2: #e0592f;
+  --accent-ink: #1a0e06;
+  --c-sarvam: #ff8a3d;
+  --c-flagsmith: #9f8cff;
+  --c-nudgebee: #3ccfb4;
+  --c-app: #9a9aa5;
+  --c-ok: #4ade80;
+  --c-bad: #f87171;
+  --c-lat: #f3a632;
+}
+
+/* ------------------------------------------------------------------ base */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background-color 0.9s var(--ease-out), color 0.9s var(--ease-out);
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+code,
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.dot-sep {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.5;
+  display: inline-block;
+}
+
+/* ------------------------------------------------------------------ buttons */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  transition: transform 0.25s var(--ease-out), background-color 0.3s, box-shadow 0.3s, opacity 0.2s;
+  white-space: nowrap;
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn--primary {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 92%, white) 0%, var(--accent) 100%);
+  color: var(--accent-ink);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 10px 30px -10px var(--accent);
+}
+
+.btn--primary:hover:not(:disabled) {
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 14px 40px -10px var(--accent);
+}
+
+.btn--primary:disabled {
+  opacity: 0.35;
+  box-shadow: none;
+}
+
+.btn--lg {
+  height: 56px;
+  padding: 0 28px;
+  font-size: 17px;
+}
+
+.btn--small {
+  height: 34px;
+  padding: 0 14px;
+  font-size: 13.5px;
+}
+
+.btn--ghost {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--text);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+
+.btn--fire {
+  background: linear-gradient(180deg, #ff8a3d, #e0592f);
+  color: #1d0800;
+  font-weight: 600;
+  box-shadow: 0 8px 28px -10px #ff6a2f;
+}
+
+.linkish {
+  color: var(--muted);
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--line-2);
+  transition: color 0.2s;
+}
+
+.linkish:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.linkish:disabled {
+  opacity: 0.4;
+}
+
+.fineprint {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.fineprint b {
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.fineprint .warn {
+  color: var(--accent-2);
+}
+
+/* ------------------------------------------------------------------ diya */
+
+.diya {
+  position: relative;
+  display: inline-block;
+  flex: none;
+}
+
+.diya svg {
+  display: block;
+  overflow: visible;
+}
+
+.diya__flame-wrap {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform 0.12s linear;
+}
+
+.diya__flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: flicker 2.6s ease-in-out infinite;
+}
+
+.diya__halo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: halo 3.2s ease-in-out infinite;
+}
+
+.diya--speaking .diya__flame {
+  animation: sway 1.1s ease-in-out infinite;
+}
+
+.diya--speaking .diya__halo {
+  animation: halo 1.1s ease-in-out infinite;
+}
+
+.diya--thinking .diya__flame {
+  animation: breathe 1.4s ease-in-out infinite;
+}
+
+.diya--listening .diya__halo {
+  animation: none;
+  opacity: 1;
+  transform: scale(1.12);
+}
+
+.diya__smoke path {
+  stroke-dasharray: 80;
+  animation: smoke 3s ease-in-out infinite;
+}
+
+@keyframes flicker {
+  0%,
+  100% {
+    transform: scale(1, 1) skewX(0deg);
+  }
+  20% {
+    transform: scale(0.97, 1.03) skewX(1.5deg);
+  }
+  45% {
+    transform: scale(1.02, 0.97) skewX(-1deg);
+  }
+  70% {
+    transform: scale(0.98, 1.04) skewX(1deg);
+  }
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: scale(1, 1) skewX(-3deg);
+  }
+  50% {
+    transform: scale(1.04, 1.1) skewX(3deg);
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(0.94);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+
+@keyframes halo {
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes smoke {
+  0% {
+    stroke-dashoffset: 80;
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.6;
+  }
+  100% {
+    stroke-dashoffset: -80;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
