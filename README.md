@@ -2,6 +2,8 @@
 
 **Your puja, guided out loud in your mother tongue, at your city's muhurat.**
 
+▶ **[Watch the 2-minute demo](https://github.com/vishnu-emergent/puja-saathi/releases/download/v1.0/puja-saathi-demo.mp4)** · Built for Festive Hacks × WeAreDevelopers India 2026
+
 Every Deepavali, millions of young Indians celebrate far from home: in hostels, PGs and first apartments. They want to do the puja properly, so they end up on a video call with Amma halfway through: *"what do I do with the rice?"*
 
 Puja Saathi is a patient elder in your pocket. Pick your city and language. It opens at **your city's muhurat** and teaches **your region's ritual**: Lakshmi Puja in Delhi, Kali Puja in Kolkata on the same night, Karthigai Deepam in Chennai, Lohri in Amritsar, Pongal at sunrise. It walks you through every step aloud. Tap the diya and ask *"I don't have marigolds, what can I use?"* in Bengali, and it answers in Bengali.
